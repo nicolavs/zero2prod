@@ -1,13 +1,21 @@
-use actix_web::{web, App, HttpResponse, HttpServer, Responder};
+use axum::{routing::get, Router};
 
-async fn health_check() -> impl Responder {
-    HttpResponse::Ok()
+use axum::extract::Path;
+
+async fn greet(Path(user_name): Path<String>) -> String {
+    format!("Hello {}!", user_name)
 }
 
-#[actix_web::main] // or #[tokio::main]
-async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| App::new().route("/health_check", web::get().to(health_check)))
-        .bind("127.0.0.1:8000")?
-        .run()
+#[tokio::main]
+async fn main() {
+    // build our application with a single route
+    let app = Router::new()
+        .route("/{name}", get(greet))
+        .route("/", get(|| async { "Hello, World!" }));
+
+    // run our app with hyper, listening globally on port 3000
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:8000")
         .await
+        .unwrap();
+    axum::serve(listener, app).await.unwrap();
 }
