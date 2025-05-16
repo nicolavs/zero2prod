@@ -1,6 +1,5 @@
 use sqlx;
 use sqlx::postgres::PgPool;
-use sqlx::{Connection, PgConnection};
 use zero2prod::configuration::get_configuration;
 use zero2prod::new_pgpool;
 

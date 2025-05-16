@@ -12,6 +12,9 @@ async fn main() {
     let pool = new_pgpool(&configuration.database.connection_string()).await;
 
     let port = listener.local_addr().unwrap().port();
-    println!("Server running on {}", format_args!("http://127.0.0.1:{}", port));
+    println!(
+        "Server running on {}",
+        format_args!("http://127.0.0.1:{}", port)
+    );
     run(listener, pool).await
 }
