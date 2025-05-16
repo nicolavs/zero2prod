@@ -7,16 +7,16 @@ use axum::{
     extract::{rejection::FormRejection, Form, FromRequest, Request},
     http::StatusCode,
     response::{IntoResponse, Response},
-    routing::get,
-    routing::post,
-    Router,
 };
 use serde::de::DeserializeOwned;
 use thiserror::Error;
 use validator::Validate;
 
-use sqlx::postgres::{PgPool, PgPoolOptions};
+use sqlx::postgres::PgPoolOptions;
 use std::time::Duration;
+
+use axum::extract::Path;
+use sqlx::{Pool, Postgres};
 
 #[derive(Debug, Clone, Copy, Default)]
 pub struct ValidatedForm<T>(pub T);
@@ -58,27 +58,9 @@ impl IntoResponse for ServerError {
     }
 }
 
-use axum::extract::Path;
-use sqlx::{Pool, Postgres};
-use tokio::net::TcpListener;
-
 async fn greet(Path(user_name): Path<String>) -> String {
     format!("Hello {}!", user_name)
 }
-
-fn app(pool: PgPool) -> Router {
-    Router::new()
-        .route("/{name}", get(greet))
-        .route("/", get(|| async { "Hello, World!" }))
-        .route("/health_check", get(routes::health_check))
-        .route("/subscriptions", post(routes::subscribe))
-        .with_state(pool)
-}
-
-pub async fn run(listener: TcpListener, db: PgPool) {
-    axum::serve(listener, app(db)).await.unwrap();
-}
-
 pub async fn new_pgpool(db_connection_str: &str) -> Pool<Postgres> {
     PgPoolOptions::new()
         .max_connections(5)

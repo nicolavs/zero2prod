@@ -16,7 +16,7 @@ async fn spawn_app() -> TestApp {
     let port = listener.local_addr().unwrap().port();
     let configuration = get_configuration().expect("Failed to read configuration.");
     let pool = new_pgpool(&configuration.database.connection_string()).await;
-    let server = zero2prod::run(listener, pool.clone());
+    let server = zero2prod::startup::run(listener, pool.clone());
 
     tokio::spawn(server);
     tokio::time::sleep(std::time::Duration::from_millis(100)).await;

@@ -1,5 +1,5 @@
 use zero2prod::configuration::get_configuration;
-use zero2prod::{new_pgpool, run};
+use zero2prod::{new_pgpool, startup::run};
 #[tokio::main]
 async fn main() {
     let configuration = get_configuration().expect("Failed to read configuration.");
